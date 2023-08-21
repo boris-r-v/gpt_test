@@ -4,9 +4,41 @@ import torch
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # В этом файле текст стиза Пушкина "Зимнее утро"
 
-train_path = 'train_dataset.txt'
-f=open(train_path, 'r' )
-print(f.readline())
+text="""
+Мороз и солнце; день чудесный! 
+Еще ты дремлешь, друг прелестный —
+Пора, красавица, проснись:
+Открой сомкнуты негой взоры
+Навстречу северной Авроры,
+Звездою севера явись!
+Вечор, ты помнишь, вьюга злилась,
+На мутном небе мгла носилась;
+Луна, как бледное пятно,
+Сквозь тучи мрачные желтела,
+И ты печальная сидела —
+А нынче… погляди в окно:
+Под голубыми небесами
+Великолепными коврами,
+Блестя на солнце, снег лежит;
+Прозрачный лес один чернеет,
+И ель сквозь иней зеленеет,
+И речка подо льдом блестит.
+Вся комната янтарным блеском
+Озарена. Веселым треском
+Трещит затопленная печь.
+Приятно думать у лежанки.
+Но знаешь: не велеть ли в санки
+Кобылку бурую запречь?
+Скользя по утреннему снегу,
+Друг милый, предадимся бегу
+Нетерпеливого коня
+И навестим поля пустые,
+Леса, недавно столь густые,
+И берег, милый для меня."""
+
+train_path = 'train_dataset1.txt'
+with open(train_path, "w", encoding="utf-8") as f:
+    f.write(text)
 
 print("Starting at:-", datetime.datetime.now() )
 print ("Using device: -", DEVICE)
@@ -24,7 +56,9 @@ from transformers import TextDataset, DataCollatorForLanguageModeling
 print("Preparing dataset:-", datetime.datetime.now() )
 # Создание датасета
 train_dataset = TextDataset(tokenizer=tokenizer, file_path=train_path, block_size=64)
-print( len(train_dataset))
+
+if ( 0 == len(train_dataset) ):
+    raise Exception("Sorry, dataset is empty")
 
 print("Preparing data loader:-", datetime.datetime.now() )
 # Создание даталодера (нарезает текст на оптимальные по длине куски)
@@ -35,7 +69,7 @@ print("Creating training arguments:-", datetime.datetime.now() )
 training_args = TrainingArguments(
     output_dir="./finetuned", # The output directory
     overwrite_output_dir=True, # Overwrite the content of the output dir
-    num_train_epochs=200, # number of training epochs
+    num_train_epochs=200 , # number of training epochs
     per_device_train_batch_size=32, # batch size for training
     per_device_eval_batch_size=32,  # batch size for evaluation
     warmup_steps=10, # number of warmup steps for learning rate scheduler
@@ -73,6 +107,10 @@ print("Model answer decode :-", datetime.datetime.now() )
 generated_text = list(map(tokenizer.decode, out))[0]
 
 print("Answer print:-", datetime.datetime.now() )
+print ("")
 print(generated_text)
 
 print("Done:-", datetime.datetime.now() )
+
+model.save_pretrained("t1small", from_pt=True)
+trainer.save_model("t2_trained")
