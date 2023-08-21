@@ -5,12 +5,11 @@ DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print (DEVICE)
 
 path = "sberbank-ai/rugpt3large_based_on_gpt2"
-model_name_or_path = "C:/Users/boris/PycharmProjects/GPT_1/tuned_model"
 
 tokenizer = GPT2Tokenizer.from_pretrained(path)
-model = GPT2LMHeadModel.from_pretrained(model_name_or_path).to(DEVICE)
+model = GPT2LMHeadModel.from_pretrained(path).to(DEVICE)
 
-text = "Как же сложно учить матанализ!\n"
+text = "Странное задание - писать манул о GPT\nКогда на хабре все разжеванно"
 input_ids = tokenizer.encode(text, return_tensors="pt").to(DEVICE)
 
 model.eval()
